@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "src/api",
+    "src/common",
+    "src/module/retrospective",
+]

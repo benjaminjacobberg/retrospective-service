@@ -1,0 +1,29 @@
+version: '3'
+volumes:
+  identity-provider-database-data:
+    driver: local
+services:
+  identity-provider-database:
+    image: postgres
+    volumes:
+      - identity-provider-database-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+  identity-provider:
+    image: jboss/keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: identity-provider-database
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_EXTRA_ARGS: -Dkeycloak.profile.feature.upload_scripts=enabled
+    ports:
+      - "8081:8080"
+    depends_on:
+      - identity-provider-database

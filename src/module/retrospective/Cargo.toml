@@ -1,0 +1,12 @@
+[package]
+name = "retrospective"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+common = { path = "../../common" }
+chrono = { version = "0.4.19", features = ["serde"] }
+serde = { version = "1.0.137", features = ["derive", "serde_derive"] }
+uuid = { version = "1.0.0", features = ["v4", "serde"] }
