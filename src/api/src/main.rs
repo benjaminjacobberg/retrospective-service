@@ -1,34 +1,43 @@
+mod auth;
+
 #[macro_use]
 extern crate dotenv_codegen;
 
-use std::error::Error;
-use actix_web::{get, web, App, HttpServer, Responder};
-use oauth2::basic::BasicClient;
-use oauth2::{AuthUrl, ClientId, ClientSecret, CsrfToken, RedirectUrl, Scope, TokenUrl};
+use actix_session::storage::CookieSessionStore;
+use actix_session::{Session, SessionMiddleware};
+use actix_web::cookie::Key;
+use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 
-#[get("/hello/{name}")]
-async fn greet(name: web::Path<String>) -> impl Responder {
-    format!("Hello {name}!")
+use actix_web::web::Data;
+
+use crate::auth::{authorization_code_grant, login, logout, OAuth2Client, SessionKey, User};
+
+#[get("/")]
+async fn index(session: Session) -> impl Responder {
+    let user_option: Option<User> = session.get(SessionKey::User.as_ref()).ok().flatten();
+    return if user_option.is_some() {
+        let user = user_option.unwrap();
+        HttpResponse::Ok().json(user)
+    } else {
+        HttpResponse::Ok().finish()
+    };
 }
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let client =
-        BasicClient::new(
-            ClientId::new(String::from(dotenv!("OAUTH2_CLIENT_ID"))),
-            Some(ClientSecret::new(String::from(dotenv!("OAUTH2_CLIENT_SECRET")))),
-            AuthUrl::new(String::from(dotenv!("OAUTH2_AUTHORIZATION_URL"))).unwrap(),
-            Some(TokenUrl::new(String::from(dotenv!("OAUTH2_TOKEN_URL"))).unwrap()),
-        ).set_redirect_uri(RedirectUrl::new("https://localhost:8080/".to_string()).unwrap());
-    let (authorize_url, csrf_state) = client
-        .authorize_url(CsrfToken::new_random)
-        .add_scope(Scope::new("user:email".to_string()))
-        .url();
-
     HttpServer::new(|| {
-        App::new().service(greet)
+        App::new()
+            .app_data(Data::new(OAuth2Client::new().clone()))
+            .wrap(SessionMiddleware::new(
+                CookieSessionStore::default(),
+                Key::from(&[0; 64]),
+            ))
+            .service(login)
+            .service(logout)
+            .service(authorization_code_grant)
+            .service(index)
     })
-        .bind(dotenv!("SOCKET_ADDRESS"))?
-        .run()
-        .await
+    .bind(dotenv!("SOCKET_ADDRESS"))?
+    .run()
+    .await
 }

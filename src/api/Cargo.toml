@@ -6,9 +6,14 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+actix-web = "4.1"
+actix-session = { version = "0.6.2", features = ["cookie-session"] }
+oauth2 = "4.2.0"
 dotenv = "0.15"
 dotenv_codegen = "0.15"
-actix-web = "4.1"
 uuid = { version = "1.0.0", features = ["v4", "serde"] }
 retrospective = { path = "../module/retrospective" }
-oauth2 = "4.2.0"
+serde = { version = "1.0.137", features = ["derive", "serde_derive"] }
+jsonwebtoken = "8.1"
+strum = "0.24"
+strum_macros = "0.24"

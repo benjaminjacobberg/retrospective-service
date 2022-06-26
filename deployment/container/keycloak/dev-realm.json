@@ -626,7 +626,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "Ntmi9Nv319oUw0e5sWrXjzDj3s2Syqsy",
-    "redirectUris" : [ "*" ],
+    "redirectUris" : [ "http://localhost:8080/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
