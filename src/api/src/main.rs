@@ -1,43 +1,47 @@
-mod auth;
-
 #[macro_use]
-extern crate dotenv_codegen;
+extern crate rocket;
 
-use actix_session::storage::CookieSessionStore;
-use actix_session::{Session, SessionMiddleware};
-use actix_web::cookie::Key;
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use std::error::Error;
 
-use actix_web::web::Data;
+use rocket::request::{FromRequest, Outcome};
+use rocket::Request;
+use serde::{Deserialize, Serialize};
 
-use crate::auth::{authorization_code_grant, login, logout, OAuth2Client, SessionKey, User};
-
-#[get("/")]
-async fn index(session: Session) -> impl Responder {
-    let user_option: Option<User> = session.get(SessionKey::User.as_ref()).ok().flatten();
-    return if user_option.is_some() {
-        let user = user_option.unwrap();
-        HttpResponse::Ok().json(user)
-    } else {
-        HttpResponse::Ok().finish()
-    };
+#[derive(Serialize, Deserialize)]
+struct IdToken {
+    email: String,
 }
 
-#[actix_web::main] // or #[tokio::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new()
-            .app_data(Data::new(OAuth2Client::new().clone()))
-            .wrap(SessionMiddleware::new(
-                CookieSessionStore::default(),
-                Key::from(&[0; 64]),
-            ))
-            .service(login)
-            .service(logout)
-            .service(authorization_code_grant)
-            .service(index)
-    })
-    .bind(dotenv!("SOCKET_ADDRESS"))?
-    .run()
-    .await
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for IdToken {
+    type Error = ();
+    async fn from_request(request: &'r Request<'_>) -> Outcome<IdToken, Self::Error> {
+        let token_opt_result: Option<Result<Vec<u8>, Box<dyn Error>>> = request
+            .headers()
+            .get_one("x-id-token")
+            .map(|encoded_token| base64::decode(encoded_token).map_err(|e| e.into()));
+        match token_opt_result {
+            Some(Ok(token)) => {
+                let id_token: IdToken =
+                    serde_json::from_slice(token.as_ref()).expect("id_token expected");
+                Outcome::Success(id_token)
+            }
+            _ => Outcome::Forward(()),
+        }
+    }
+}
+
+#[get("/")]
+fn user_info(id_token: IdToken) -> String {
+    id_token.email
+}
+
+#[get("/", rank = 2)]
+fn no_info() -> String {
+    String::from("no info")
+}
+
+#[launch]
+fn rocket() -> _ {
+    rocket::build().mount("/api/v1", routes![user_info, no_info])
 }

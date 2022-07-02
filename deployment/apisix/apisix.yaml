@@ -1,0 +1,31 @@
+routes:
+  -
+    uri: /*
+    plugins:
+      openid-connect:
+        client_id: apisix
+        client_secret: Ntmi9Nv319oUw0e5sWrXjzDj3s2Syqsy
+        discovery: http://localhost:8080/auth/realms/dev/.well-known/openid-configuration
+        scope: openid email
+        bearer_only: false
+        realm: dev
+        introspection_endpoint_auth_method: client_secret_post
+        redirect_uri: http://localhost:9080/
+    upstream:
+      nodes:
+        - host: localhost
+          port: 8000
+          weight: 1
+      timeout:
+        connect: 6
+        send: 6
+        read: 6
+      type: roundrobin
+      scheme: http
+      pass_host: pass
+      name: retrospective-service
+      keepalive_pool:
+        idle_timeout: 60
+        requests: 1000
+        size: 320
+#END

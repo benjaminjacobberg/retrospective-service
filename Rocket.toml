@@ -1,13 +1,4 @@
-[default.tls]
-certs = "api/private/rsa_sha256_cert.pem"
-key = "api/private/rsa_sha256_key.pem"
-
-[default.tls.mutual]
-ca_certs = "private/ca_cert.pem"
-mandatory = false
-
-[global.oauth.github]
-provider = "GitHub"
-client_id = "9f19698c20fb7cc62af5"
-client_secret = "bca4b2d831acb4131f78d4e0d660da6944bcaccd"
-redirect_uri = "http://localhost:8000/auth/github"
+[default]
+address = "127.0.0.1"
+port = 8000
+cli_colors = true

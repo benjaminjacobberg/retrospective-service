@@ -1,0 +1,19 @@
+services:
+  apisix:
+    container_name: apisix
+    image: apache/apisix:latest
+    network_mode: host
+    volumes:
+      - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml:z
+      - ./apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:z
+  keycloak:
+    network_mode: host
+    container_name: keycloak
+    image: jboss/keycloak
+    volumes:
+      - ./keycloak/dev_realm.json:/opt/jboss/keycloak/imports/dev_realm.json:z
+    environment:
+      - KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/dev_realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - PROXY_ADDRESS_FORWARDING=true

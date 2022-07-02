@@ -76,7 +76,7 @@
       "attributes" : { }
     } ],
     "client" : {
-      "stoodly-service" : [ {
+      "apisix" : [ {
         "id" : "a2be6166-a89e-42ea-bb96-6c673bdf6929",
         "name" : "uma_protection",
         "composite" : false,
@@ -380,11 +380,11 @@
   "users" : [ {
     "id" : "7a9a4a10-fc5f-4830-bdb7-c9409b579643",
     "createdTimestamp" : 1656249936370,
-    "username" : "benjamin",
+    "username" : "user",
     "enabled" : true,
     "totp" : false,
     "emailVerified" : true,
-    "email" : "benjaminjacobberg@gmail.com",
+    "email" : "user@example.com",
     "credentials" : [ {
       "id" : "771cb7a0-d322-42cb-8cdb-45733d29a11b",
       "type" : "password",
@@ -396,24 +396,24 @@
     "requiredActions" : [ ],
     "realmRoles" : [ "default-roles-dev" ],
     "clientRoles" : {
-      "stoodly-service" : [ "USER" ]
+      "apisix" : [ "USER" ]
     },
     "notBefore" : 0,
     "groups" : [ ]
   }, {
     "id" : "6df56ebd-7181-476c-8664-46f7c07c1311",
     "createdTimestamp" : 1656249853421,
-    "username" : "service-account-stoodly-service",
+    "username" : "service-account-apisix",
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,
-    "serviceAccountClientId" : "stoodly-service",
+    "serviceAccountClientId" : "apisix",
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
     "realmRoles" : [ "default-roles-dev" ],
     "clientRoles" : {
-      "stoodly-service" : [ "uma_protection" ]
+      "apisix" : [ "uma_protection" ]
     },
     "notBefore" : 0,
     "groups" : [ ]
@@ -619,14 +619,13 @@
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "ce062237-d794-4071-ab60-492609ebe499",
-    "clientId" : "stoodly-service",
-    "rootUrl" : "http://localhost:8080",
+    "clientId" : "apisix",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "Ntmi9Nv319oUw0e5sWrXjzDj3s2Syqsy",
-    "redirectUris" : [ "http://localhost:8080/*" ],
+    "redirectUris" : [ "*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -646,7 +645,7 @@
       "saml.multivalued.roles" : "false",
       "saml.encrypt" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
-      "backchannel.logout.revoke.offline.tokens" : "false",
+      "backchannel.logout.revoke.offline.tokens" : "true",
       "saml.server.signature" : "false",
       "saml.server.signature.keyinfo.ext" : "false",
       "use.refresh.tokens" : "true",
@@ -713,7 +712,7 @@
       "policyEnforcementMode" : "ENFORCING",
       "resources" : [ {
         "name" : "Default Resource",
-        "type" : "urn:stoodly-service:resources:default",
+        "type" : "urn:apisix:resources:default",
         "ownerManagedAccess" : false,
         "attributes" : { },
         "_id" : "413e6206-043b-4f0d-91fc-75e2b5c14cbe",
@@ -737,7 +736,7 @@
         "logic" : "POSITIVE",
         "decisionStrategy" : "UNANIMOUS",
         "config" : {
-          "defaultResourceType" : "urn:stoodly-service:resources:default",
+          "defaultResourceType" : "urn:apisix:resources:default",
           "applyPolicies" : "[\"Default Policy\"]"
         }
       } ],
